@@ -1,8 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { themes } from "github-contributions-canvas";
+import { CustomTheme } from "./customTheme";
 
 const availableThemes = {
+  custom: 'Custom',
   standard: "GitHub",
   classic: "GitHub Classic",
   githubDark: "GitHub Dark",
@@ -16,11 +18,15 @@ const availableThemes = {
   pink: "Pink",
   YlGnBu: "YlGnBu",
   solarizedDark: 'Solarized Dark',
-  solarizedLight: 'Solarized Light'
+  solarizedLight: 'Solarized Light',
 };
 
-const Preview = ({ themeName }) => (
-  <div
+const Preview = ({ themeName }) => {
+  if (!themes[themeName]) {
+    return null;
+  }
+
+  return <div
     className="Theme-preview"
     style={{ backgroundColor: themes[themeName].background }}
   >
@@ -29,13 +35,14 @@ const Preview = ({ themeName }) => (
     <span style={{ backgroundColor: themes[themeName].grade3 }}></span>
     <span style={{ backgroundColor: themes[themeName].grade4 }}></span>
   </div>
-);
+};
 
-const ThemeSelector = ({ currentTheme, onChangeTheme }) => (
+const ThemeSelector = ({ currentTheme, onChangeTheme, onSubmitTheme, ...rest }) => (
   <div className="App-themes">
     <h6>
       <span>Select a theme:</span>
     </h6>
+    {currentTheme === "custom" && <CustomTheme onSubmitTheme={onSubmitTheme} {...rest} />}
     <div className="App-themes-list">
       {Object.keys(availableThemes).map((themeName) => (
         <label key={themeName}>

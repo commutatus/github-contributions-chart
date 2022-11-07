@@ -7,9 +7,10 @@ const App = () => {
   const canvasRef = useRef();
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
-  const [theme, setTheme] = useState("standard");
+  const [theme, setTheme] = useState("custom");
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
+  const [customTheme, setCustomTheme] = useState(null);
 
   useEffect(() => {
     if (!data) {
@@ -20,6 +21,11 @@ const App = () => {
 
   const handleSubmit = e => {
     e.preventDefault();
+
+    if (theme === "custom" && !customTheme) {
+      setError("Invalid custom theme JSON");
+      return;
+    }
 
     setUsername(cleanUsername(username));
     setLoading(true);
@@ -61,7 +67,7 @@ const App = () => {
     uploadToTwitter(canvasRef.current);
   };
 
-  const draw = async () => {
+  const draw = async (latestTheme) => {
     if (!canvasRef.current || !data) {
       setError("Something went wrong... Check back later.");
       return;
@@ -69,12 +75,18 @@ const App = () => {
 
     const { drawContributions } = await import("github-contributions-canvas");
 
-    drawContributions(canvasRef.current, {
+    const opts = {
       data,
       username: username,
       themeName: theme,
       footerText: "Made by @sallar & friends - github-contributions.now.sh"
-    });
+    };
+
+    if (theme === "custom") {
+      opts.customTheme = latestTheme || customTheme;
+    }
+
+    drawContributions(canvasRef.current, opts);
   };
 
   const _renderGithubButton = () => {
@@ -167,7 +179,7 @@ const App = () => {
     if (data === null) return;
     return (
       <a
-        href="#" 
+        href="#"
         onClick={onDownloadJson}
       >
         <span role="img" aria-label="Bar Chart">
@@ -190,6 +202,9 @@ const App = () => {
         <ThemeSelector
           currentTheme={theme}
           onChangeTheme={themeName => setTheme(themeName)}
+          onSubmitTheme={setCustomTheme}
+          userData={data}
+          updateGraph={draw}
         />
         {_renderGithubButton()}
         <footer>
