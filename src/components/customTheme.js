@@ -1,57 +1,54 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
-const blankThemeJSON = JSON.stringify({
-  background: '',
-  text: '',
-  meta: '',
-  grade4: '',
-  grade3: '',
-  grade2: '',
-  grade1: '',
-  grade0: '',
-});
+let lastTimeout = null;
 
-export const CustomTheme = ({ onSubmitTheme, userData, updateGraph }) => {
-  const [customTheme, setCustomTheme] = useState(blankThemeJSON);
+export const CustomTheme = ({ customTheme, setCustomTheme, userData, updateGraph }) => {
 
   useEffect(() => {
-    const theme = localStorage.getItem('customTheme');
-    if (theme) {
+    const themeRaw = localStorage.getItem('customTheme');
+    if (themeRaw) {
+      const theme = JSON.parse(themeRaw);
       setCustomTheme(theme);
-      onSubmitTheme(JSON.parse(theme));
     }
   }, []);
 
-  const handleTextChange = (event) => {
-    console.log(event.target.value);
-    setCustomTheme(event.target.value);
+  const updateGraphThrottled = useCallback((newTheme) => {
+    if (lastTimeout) {
+      clearTimeout(lastTimeout);
+    }
+    lastTimeout = setTimeout(() => {
+      updateGraph(newTheme);
+      lastTimeout = null;
+    }, 50);
+  }, []);
+
+  const handleColorChange = (event, keyName) => {
+    const newTheme = {
+      ...customTheme,
+      [keyName]: event.target.value,
+    };
+    setCustomTheme(newTheme);
+    if (userData) {
+      updateGraphThrottled(newTheme);
+    }
   };
 
   const handleSaveTheme = () => {
-    let theme;
-    try {
-      theme = JSON.parse(customTheme);
-    } catch (e) {
-      console.log(e);
-      alert('Invalid JSON');
-      return;
-    }
-
-    if (!theme) {
-      alert("Empty JSON");
-      return;
-    }
-
-    localStorage.setItem('customTheme', customTheme);
-    onSubmitTheme(theme);
-    if (userData) {
-      updateGraph(theme);
-    }
+    localStorage.setItem('customTheme', JSON.stringify(customTheme));
   };
 
-  return <div>Custom theme JSON:
-    <textarea value={customTheme} onChange={handleTextChange} rows={7} />
+  return <div>Customize theme:
+    <div>
+      {
+        Object.keys(customTheme).map((key) => {
+          return <div key={key} className="picker-row">
+            <label>{key}</label>
+            <input type="color" value={customTheme[key]} onChange={(e) => handleColorChange(e, key)} />
+          </div>;
+        })
+      }
+    </div>
     <br />
-    <button onClick={handleSaveTheme}>{userData ? 'Apply' : 'Save'}</button>
+    <button onClick={handleSaveTheme}>Save</button>
   </div>;
 };

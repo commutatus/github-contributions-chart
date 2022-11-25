@@ -37,12 +37,12 @@ const Preview = ({ themeName }) => {
   </div>
 };
 
-const ThemeSelector = ({ currentTheme, onChangeTheme, onSubmitTheme, ...rest }) => (
+const ThemeSelector = ({ currentTheme, onChangeTheme, ...rest }) => (
   <div className="App-themes">
     <h6>
       <span>Select a theme:</span>
     </h6>
-    {currentTheme === "custom" && <CustomTheme onSubmitTheme={onSubmitTheme} {...rest} />}
+    {currentTheme === "custom" && <CustomTheme {...rest} />}
     <div className="App-themes-list">
       {Object.keys(availableThemes).map((themeName) => (
         <label key={themeName}>

@@ -2,6 +2,17 @@ import React, { useRef, useState, useEffect } from "react";
 import { download, uploadToTwitter, fetchData, downloadJSON, cleanUsername } from "../utils/export";
 import ThemeSelector from "../components/themes";
 
+const blankThemeJSON = {
+  background: '',
+  text: '',
+  meta: '',
+  grade4: '',
+  grade3: '',
+  grade2: '',
+  grade1: '',
+  grade0: '',
+};
+
 const App = () => {
   const inputRef = useRef();
   const canvasRef = useRef();
@@ -10,7 +21,7 @@ const App = () => {
   const [theme, setTheme] = useState("custom");
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [customTheme, setCustomTheme] = useState(null);
+  const [customTheme, setCustomTheme] = useState(blankThemeJSON);
 
   useEffect(() => {
     if (!data) {
@@ -202,7 +213,8 @@ const App = () => {
         <ThemeSelector
           currentTheme={theme}
           onChangeTheme={themeName => setTheme(themeName)}
-          onSubmitTheme={setCustomTheme}
+          setCustomTheme={setCustomTheme}
+          customTheme={customTheme}
           userData={data}
           updateGraph={draw}
         />
