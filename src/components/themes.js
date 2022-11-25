@@ -1,10 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { themes } from "github-contributions-canvas";
+import themes from '../utils/themes';
 import { CustomTheme } from "./customTheme";
 
 const availableThemes = {
   custom: 'Custom',
+  commutatus: 'Commutatus',
   standard: "GitHub",
   classic: "GitHub Classic",
   githubDark: "GitHub Dark",

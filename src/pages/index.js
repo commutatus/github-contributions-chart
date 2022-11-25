@@ -1,17 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { download, uploadToTwitter, fetchData, downloadJSON, cleanUsername } from "../utils/export";
 import ThemeSelector from "../components/themes";
+import themes from "../utils/themes";
 
-const blankThemeJSON = {
-  background: '',
-  text: '',
-  meta: '',
-  grade4: '',
-  grade3: '',
-  grade2: '',
-  grade1: '',
-  grade0: '',
-};
+const blankThemeJSON = { ...themes.commutatus };
 
 const App = () => {
   const inputRef = useRef();
@@ -95,6 +87,9 @@ const App = () => {
 
     if (theme === "custom") {
       opts.customTheme = latestTheme || customTheme;
+    } else if (theme === "commutatus") {
+      opts.themeName = "custom";
+      opts.customTheme = themes.commutatus;
     }
 
     drawContributions(canvasRef.current, opts);
@@ -194,7 +189,7 @@ const App = () => {
         onClick={onDownloadJson}
       >
         <span role="img" aria-label="Bar Chart">
-        📊
+          📊
         </span>{" "}
         Download data as JSON for your own visualizations
       </a>
