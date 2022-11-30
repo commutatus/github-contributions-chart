@@ -1,12 +1,14 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 let lastTimeout = null;
 
 export const CustomTheme = ({ customTheme, setCustomTheme, userData, updateGraph }) => {
+  const [newThemeText, setNewThemeText] = useState(JSON.stringify(customTheme) || "");
 
   useEffect(() => {
     const themeRaw = localStorage.getItem('customTheme');
     if (themeRaw) {
+      setNewThemeText(themeRaw);
       const theme = JSON.parse(themeRaw);
       setCustomTheme(theme);
     }
@@ -22,33 +24,32 @@ export const CustomTheme = ({ customTheme, setCustomTheme, userData, updateGraph
     }, 50);
   }, []);
 
-  const handleColorChange = (event, keyName) => {
-    const newTheme = {
-      ...customTheme,
-      [keyName]: event.target.value,
-    };
-    setCustomTheme(newTheme);
+  const handleSaveTheme = () => {
+    let parsedTheme;
+
+    try {
+      parsedTheme = JSON.parse(newThemeText);
+    } catch {
+      alert('Invalid JSON');
+      return;
+    }
+
+    localStorage.setItem('customTheme', newThemeText);
+    setCustomTheme(parsedTheme);
     if (userData) {
-      updateGraphThrottled(newTheme);
+      updateGraphThrottled(parsedTheme);
     }
   };
 
-  const handleSaveTheme = () => {
-    localStorage.setItem('customTheme', JSON.stringify(customTheme));
+  const handleTextChange = (event) => {
+    setNewThemeText(event.target.value);
   };
 
   return <div>Customize theme:
     <div>
-      {
-        Object.keys(customTheme).map((key) => {
-          return <div key={key} className="picker-row">
-            <label>{key}</label>
-            <input type="color" value={customTheme[key]} onChange={(e) => handleColorChange(e, key)} />
-          </div>;
-        })
-      }
+    <textarea value={newThemeText} onChange={handleTextChange} rows={7} />
     </div>
     <br />
-    <button onClick={handleSaveTheme}>Save</button>
+    <button onClick={handleSaveTheme}>Save{userData && ' & Apply'}</button>
   </div>;
 };
